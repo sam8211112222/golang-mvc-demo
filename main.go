@@ -1,7 +1,7 @@
 package main
 
 import (
-	"golang-mvc-demo/viewmodel"
+	"golang-mvc-demo/controller"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -10,35 +10,20 @@ import (
 )
 
 func main() {
+
 	templates := populateTemplates()
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		requestedFile := r.URL.Path[1:]
-		template := templates[requestedFile+".html"]
-		var context interface{}
-		switch requestedFile {
-		case "shop":
-			context = viewmodel.NewShop()
-		default:
-			context = viewmodel.NewHome()
-		}
-		if template != nil {
-			err := template.Execute(w, context)
-			if err != nil {
-				log.Println(err)
-			}
-		} else {
-			w.WriteHeader(404)
-		}
-	})
-	http.Handle("/img/", http.FileServer(http.Dir("public")))
-	http.Handle("/css/", http.FileServer(http.Dir("public")))
-	http.ListenAndServe(":8000", nil)
+	controller.StartUp(templates)
+	err := http.ListenAndServe(":8000", nil)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func populateTemplates() map[string]*template.Template {
 	result := make(map[string]*template.Template)
 	const basePath = "templates"
 	layout := template.Must(template.ParseFiles(basePath + "/_layout.html"))
+	// 這是sub content
 	template.Must(layout.ParseFiles(basePath+"/_header.html", basePath+"/_footer.html"))
 	dir, err := os.Open(basePath + "/content")
 	if err != nil {
