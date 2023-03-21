@@ -1,5 +1,7 @@
 package model
 
+import "fmt"
+
 type Product struct {
 	Name             string
 	DescriptionShort string
@@ -114,4 +116,13 @@ var products []Product = []Product{Product{
 	ID:               8,
 	CategoryID:       1,
 },
+}
+
+func GetProduct(productID int) (*Product, error) {
+	for _, p := range products {
+		if p.ID == productID {
+			return &p, nil
+		}
+	}
+	return nil, fmt.Errorf("Product not found with ID %v", productID)
 }

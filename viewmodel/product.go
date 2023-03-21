@@ -1,11 +1,20 @@
 package viewmodel
 
-import "golang-mvc-demo/model"
+import (
+	"golang-mvc-demo/model"
+	"html/template"
+)
+
+type ProductViewModel struct {
+	Title   string
+	Active  string
+	Product Product
+}
 
 type Product struct {
 	Name             string
 	DescriptionShort string
-	DescriptionLong  string
+	DescriptionLong  template.HTML
 	PricePerLiter    float32
 	PricePer10Liter  float32
 	Origin           string
@@ -14,16 +23,24 @@ type Product struct {
 	ID               int
 }
 
-func productToVM(product model.Product) Product {
+func productToVM(product *model.Product) Product {
 	return Product{
 		Name:             product.Name,
 		DescriptionShort: product.DescriptionShort,
-		DescriptionLong:  product.DescriptionLong,
+		DescriptionLong:  template.HTML(product.DescriptionLong),
 		PricePerLiter:    product.PricePerLiter,
 		PricePer10Liter:  product.PricePer10Liter,
 		Origin:           product.Origin,
 		IsOrganic:        product.IsOrganic,
 		ImageURL:         product.ImageURL,
 		ID:               product.ID,
+	}
+}
+
+func NewProduct(product *model.Product) ProductViewModel {
+	return ProductViewModel{
+		Title:   "Lemonade Stand Supply - Shop",
+		Active:  "shop",
+		Product: productToVM(product),
 	}
 }
