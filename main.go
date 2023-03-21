@@ -1,7 +1,12 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
+	_ "github.com/lib/pq"
 	"golang-mvc-demo/controller"
+	"golang-mvc-demo/middleware"
+	"golang-mvc-demo/model"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -10,13 +15,24 @@ import (
 )
 
 func main() {
-
+	db := connectDB()
+	defer db.Close()
 	templates := populateTemplates()
 	controller.StartUp(templates)
-	err := http.ListenAndServe(":8000", nil)
+	err := http.ListenAndServe(":8000", &middleware.TimeoutMiddleware{new(middleware.GzipMiddleware)})
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+func connectDB() *sql.DB {
+	connStr := "postgres://postgres:postgres@localhost/postgres_demo_sam?sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalln(fmt.Errorf("Unable to connect to database: %v", err))
+	}
+	model.SetDatabase(db)
+	return db
 }
 
 func populateTemplates() map[string]*template.Template {
