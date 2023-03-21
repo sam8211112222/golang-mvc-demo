@@ -1,0 +1,1 @@
+tried to do a mvc architect website by golang
